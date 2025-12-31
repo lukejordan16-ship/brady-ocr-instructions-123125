@@ -9,159 +9,536 @@
     .nav-item.active { background: #4f46e5; color: white; }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
-    .primary-link { background: #4f46e5; color: white; font-weight: 600; }
-    .primary-link:hover { background: #4338ca; }
   </style>
 </head>
 <body class="bg-gray-50 min-h-screen flex">
-  <button id="menuBtn" class="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-lg" onclick="toggleMenu()">☰</button>
-  <aside id="sidebar" class="-translate-x-full lg:translate-x-0 fixed lg:sticky top-0 left-0 h-screen w-64 bg-white border-r border-gray-200 p-3 overflow-y-auto transition-transform z-40">
+  <button id="menuBtn" class="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-lg" onclick="toggleMenu()">
+    <svg id="menuIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+    <svg id="closeIcon" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+  </button>
+
+  <aside id="sidebar" class="-translate-x-full lg:translate-x-0 fixed lg:sticky top-0 left-0 h-screen w-64 bg-white border-r border-gray-200 p-3 flex-shrink-0 overflow-y-auto transition-transform z-40">
     <div class="flex items-center gap-2 px-3 py-3 mb-4">
-      <div class="w-9 h-9 bg-indigo-600 rounded-lg flex items-center justify-center text-white">📄</div>
-      <div><div class="font-bold text-gray-900 text-sm">Project Brady</div><div class="text-xs text-gray-500">OCR Instructions</div></div>
+      <div class="w-9 h-9 bg-indigo-600 rounded-lg flex items-center justify-center">
+        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+      </div>
+      <div>
+        <div class="font-bold text-gray-900 text-sm">Project Brady</div>
+        <div class="text-xs text-gray-500">OCR Instructions</div>
+      </div>
     </div>
     <nav class="space-y-1" id="nav"></nav>
   </aside>
+
   <div id="overlay" class="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30 hidden" onclick="toggleMenu()"></div>
-  <main class="flex-1 p-4 lg:p-8 overflow-auto"><div class="max-w-3xl mx-auto" id="content"></div></main>
+
+  <main class="flex-1 p-4 lg:p-8 overflow-auto">
+    <div class="max-w-3xl mx-auto" id="content"></div>
+  </main>
 
   <script>
     const tabs = [
-      {id:'home',label:'🏠 Introduction'},
-      {id:'alllinks',label:'📄 Link to All Instructions'},
-      {id:'walkthrough',label:'▶️ Task Walk-through'},
-      {id:'parimango',label:'⚙️ Parimango UI'},
-      {id:'checklist',label:'✅ Checklist'},
-      {id:'rejection',label:'🚫 Rejection Guidelines'},
-      {id:'foreign',label:'🌍 Foreign Language'},
-      {id:'annotation',label:'📝 Visual Text Annotation'},
-      {id:'reappear',label:'🔄 Reappear Tag (1s Rule)'},
-      {id:'combining',label:'📦 Combining Text'},
-      {id:'partial',label:'🏷️ Partial Tag'},
-      {id:'formatting',label:'✏️ Text Formatting'},
-      {id:'blurry',label:'👁️ Blurry Text'},
-      {id:'golden',label:'⭐ Golden Examples'},
-      {id:'errors',label:'⚠️ Common Errors'},
-      {id:'efficiency',label:'⚡ Efficiency Tips'},
-      {id:'bonuses',label:'💰 Bonuses'},
-      {id:'support',label:'🆘 Support'}
+      {id:'home',icon:'🏠',label:'Introduction'},
+      {id:'alllinks',icon:'📄',label:'Link to All Instructions'},
+      {id:'walkthrough',icon:'▶️',label:'Task Walk-through'},
+      {id:'parimango',icon:'⚙️',label:'Parimango UI'},
+      {id:'checklist',icon:'✅',label:'Checklist'},
+      {id:'rejection',icon:'🚫',label:'Rejection Guidelines'},
+      {id:'foreign',icon:'🌍',label:'Foreign Language'},
+      {id:'annotation',icon:'📝',label:'Visual Text Annotation'},
+      {id:'reappear',icon:'🔄',label:'Reappear Tag (1s Rule)'},
+      {id:'combining',icon:'📦',label:'Combining Text'},
+      {id:'partial',icon:'🏷️',label:'Partial Tag'},
+      {id:'formatting',icon:'📄',label:'Text Formatting'},
+      {id:'blurry',icon:'⭕',label:'Blurry Text'},
+      {id:'golden',icon:'⭐',label:'Golden Examples'},
+      {id:'errors',icon:'⚠️',label:'Common Errors'},
+      {id:'efficiency',icon:'⚡',label:'Efficiency Tips'},
+      {id:'bonuses',icon:'💰',label:'Bonuses'},
+      {id:'support',icon:'👥',label:'Support'}
     ];
 
-    const docs = {
-      all:'https://docs.google.com/document/d/1rxEcG83Nd88naNqygbRHaz4MaFCZmkt4wZ5oEJAoX5U/edit?tab=t.mlrf9inidopo',
-      walkthrough:'https://docs.google.com/document/d/1rxEcG83Nd88naNqygbRHaz4MaFCZmkt4wZ5oEJAoX5U/edit?tab=t.kife1a9lmyuc',
-      parimango:'https://docs.google.com/document/d/1rxEcG83Nd88naNqygbRHaz4MaFCZmkt4wZ5oEJAoX5U/edit?tab=t.rhvar9nym8md',
-      checklist:'https://docs.google.com/document/d/1rxEcG83Nd88naNqygbRHaz4MaFCZmkt4wZ5oEJAoX5U/edit?tab=t.z7k33df9q6zk',
-      rejection:'https://docs.google.com/document/d/1rxEcG83Nd88naNqygbRHaz4MaFCZmkt4wZ5oEJAoX5U/edit?tab=t.k0i0lk2yd2ry',
-      foreign:'https://docs.google.com/document/d/1rxEcG83Nd88naNqygbRHaz4MaFCZmkt4wZ5oEJAoX5U/edit?tab=t.ar5od8p5v2t',
-      annotation:'https://docs.google.com/document/d/1rxEcG83Nd88naNqygbRHaz4MaFCZmkt4wZ5oEJAoX5U/edit?tab=t.zbwyoyd8s24e',
-      reappear:'https://docs.google.com/document/d/1rxEcG83Nd88naNqygbRHaz4MaFCZmkt4wZ5oEJAoX5U/edit?tab=t.pjkfg45s9yaq',
-      combining:'https://docs.google.com/document/d/1rxEcG83Nd88naNqygbRHaz4MaFCZmkt4wZ5oEJAoX5U/edit?tab=t.ogihf4y6enq2',
-      partial:'https://docs.google.com/document/d/1rxEcG83Nd88naNqygbRHaz4MaFCZmkt4wZ5oEJAoX5U/edit?tab=t.q5z69hs42tyq',
-      formatting:'https://docs.google.com/document/d/1rxEcG83Nd88naNqygbRHaz4MaFCZmkt4wZ5oEJAoX5U/edit?tab=t.jh87t1b33gn0',
-      blurry:'https://docs.google.com/document/d/1rxEcG83Nd88naNqygbRHaz4MaFCZmkt4wZ5oEJAoX5U/edit?tab=t.u01276a1rfra',
-      golden:'https://docs.google.com/document/d/1rxEcG83Nd88naNqygbRHaz4MaFCZmkt4wZ5oEJAoX5U/edit?tab=t.dg3hkgymhnfl',
-      errors:'https://docs.google.com/document/d/1rxEcG83Nd88naNqygbRHaz4MaFCZmkt4wZ5oEJAoX5U/edit?tab=t.i4wnisvo9cum',
-      efficiency:'https://docs.google.com/document/d/1rxEcG83Nd88naNqygbRHaz4MaFCZmkt4wZ5oEJAoX5U/edit?tab=t.kdty168th20o',
-      bonuses:'https://docs.google.com/document/d/1rxEcG83Nd88naNqygbRHaz4MaFCZmkt4wZ5oEJAoX5U/edit?tab=t.9fn5f826pned'
-    };
+    const primaryLink = (url, title) => `<a href="${url}" target="_blank" class="flex items-center gap-2 p-3 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg hover:shadow-xl transition-all group"><svg class="w-5 h-5 text-indigo-200 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg><span class="flex-1 font-semibold">${title}</span><svg class="w-5 h-5 text-indigo-200 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></a>`;
+    
+    const secondaryLink = (url, title) => `<a href="${url}" target="_blank" class="flex items-center gap-2 p-3 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 transition-all"><svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg><span class="flex-1">${title}</span></a>`;
 
-    const vids = {
-      walkthrough:'https://drive.google.com/file/d/1A8aDEe4KyB0SLAydEVKBfqBTwNFMut1o/view',
-      errors:'https://drive.google.com/file/d/1Rr8y3NiSbfmWI1gt1o99HWNFv2MSTRjh/view',
-      reappear:'https://drive.google.com/file/d/1LPEqIly3Gm_g09V3LHpvVT5zRVtZfuKY/view',
-      blurry:'https://drive.google.com/file/d/1SElGngKshM9tbmdZkMppOkFMIe1ONR7-/view',
-      office:'https://drive.google.com/file/d/1-Ym0RVvPNn0h7uQyevsitu7xcyVcMmcB/view'
-    };
+    const section = (title, content) => `<div class="bg-white border border-gray-200 rounded-xl p-5 space-y-3 mb-4">${title ? `<h2 class="text-lg font-semibold text-gray-900">${title}</h2>` : ''}${content}</div>`;
+    
+    const warning = (text) => `<div class="bg-amber-50 border border-amber-200 rounded-lg p-4 flex gap-3 mb-4"><svg class="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg><div class="text-amber-800 text-sm">${text}</div></div>`;
+    
+    const tip = (text) => `<div class="bg-green-50 border border-green-200 rounded-lg p-4 flex gap-3 mb-4"><svg class="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><div class="text-green-800 text-sm">${text}</div></div>`;
 
-    const link = (url,txt,primary) => `<a href="${url}" target="_blank" class="flex items-center gap-2 p-3 ${primary?'primary-link':'bg-indigo-50 hover:bg-indigo-100 text-indigo-700'} rounded-lg text-sm mb-2">${primary?'📘':'🔗'} ${txt} ${primary?'→':''}</a>`;
-    const section = (title,content) => `<div class="bg-white border border-gray-200 rounded-xl p-5 space-y-3 mb-4"><h2 class="text-lg font-semibold text-gray-900">${title}</h2>${content}</div>`;
-    const warn = (txt) => `<div class="bg-amber-50 border border-amber-200 rounded-xl p-6 text-center mb-4"><p class="text-amber-500 text-2xl mb-2">⚠️</p><p class="text-amber-800 font-medium">${txt}</p></div>`;
-    const tip = (txt) => `<div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-4"><p class="text-green-800 text-sm">✅ ${txt}</p></div>`;
+    const visualWarning = `<div class="bg-amber-50 border border-amber-200 rounded-xl p-6 text-center mb-4"><svg class="w-8 h-8 text-amber-500 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg><p class="text-amber-800 font-medium">These instructions are complex and require visual examples.</p><p class="text-amber-700 text-sm mt-2">Please see the link to the Google Doc above to fully understand these instructions.</p></div>`;
+
+    const codeBlock = (text) => `<div class="bg-gray-900 text-green-400 rounded-lg p-4 font-mono text-sm overflow-x-auto whitespace-pre-wrap">${text}</div>`;
+
+    const stepItem = (num, title, desc) => `<div class="flex gap-3 p-3 bg-gray-50 rounded-lg"><div class="w-8 h-8 bg-indigo-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 text-sm">${num}</div><div><h3 class="font-semibold text-gray-900 text-sm">${title}</h3><p class="text-gray-600 text-xs mt-1">${desc}</p></div></div>`;
+
+    const checkItem = (text) => `<label class="flex gap-3 items-start text-sm bg-gray-50 p-3 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors"><input type="checkbox" class="mt-0.5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"><span class="text-gray-700">${text}</span></label>`;
 
     const content = {
-      home: `<div class="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-2xl p-6 text-white mb-6"><h1 class="text-2xl font-bold mb-2">Project Brady - OCR</h1><p class="text-indigo-100">Onboarding + Instructions</p><p class="text-indigo-200 text-sm mt-2">Last updated: Dec 11, 2025</p></div>
-        ${section('Introduction and Goal','<p class="text-gray-700 text-sm">AI models often struggle to break down and identify visual text in short videos. We are producing a two-part task to help AI models improve.</p>')}
-        ${section('In Practice, You Will','<div class="flex gap-3 items-start mb-2"><div class="w-6 h-6 bg-indigo-600 text-white rounded-full flex items-center justify-center text-xs font-bold">1</div><span class="text-gray-700 text-sm">Watch a short video (no more than 15 seconds)</span></div><div class="flex gap-3 items-start"><div class="w-6 h-6 bg-indigo-600 text-white rounded-full flex items-center justify-center text-xs font-bold">2</div><span class="text-gray-700 text-sm">Write down and timestamp every single piece of visual text</span></div>')}
-        ${tip('You will play a key role in enabling AI models to improve on video-related tasks.')}
-        ${section('Quick Links',link(vids.walkthrough,'Walk-through video')+link(vids.errors,'Common errors video')+link(vids.reappear,'Video on &lt;reappear&gt; tag')+link(vids.blurry,'Video on blurry text')+link(docs.foreign,'Foreign language instructions')+link(vids.office,'12/17 office hours recording'))}`,
-      
-      alllinks: `<h1 class="text-2xl font-bold text-gray-900 mb-6">Link to All Instructions</h1>${section('📄 Master Google Doc',link(docs.all,'Project Brady - OCR: All Instructions',true))}${tip('This link contains the complete set of instructions. Use this as your primary reference.')}`,
-      
-      walkthrough: `<h1 class="text-2xl font-bold text-gray-900 mb-6">Task Walk-through</h1>${section('📄 Google Doc',link(docs.walkthrough,'Task Walk-through - Full Instructions',true))}${section('Production Queue',link('https://www.parimango.com/tasks/121125-ocr-chunked-mercor-posttraining','Parimango Production Queue')+'<div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-amber-800 text-sm">⚠️ Only access the production queue via this link.</div>')}
-        ${section('Top OCR Labeler Habits','<ul class="space-y-2 text-sm text-gray-700"><li>▸ <b>Start with context:</b> Watch 1-2 times at 0.5x</li><li>▸ <b>Delete auto-generated annotations:</b> They are error-prone</li><li>▸ <b>Annotate systematically:</b> Scene-by-scene or top-to-bottom</li><li>▸ <b>Prioritize obvious text first:</b> Then smaller text</li><li>▸ <b>Use frame-by-frame review</b></li><li>▸ <b>Be strict about legibility:</b> Don\'t infer</li><li>▸ <b>Multiple review passes</b></li></ul>')}
-        ${tip('<b>Key Mindset:</b> If you see it, annotate it. If you can\'t read it, don\'t guess. Precision beats speed.')}`,
-      
-      parimango: `<h1 class="text-2xl font-bold text-gray-900 mb-6">Parimango UI</h1>${section('📄 Google Doc',link(docs.parimango,'Parimango UI - Full Instructions',true))}
-        ${section('Keyboard Shortcuts','<div class="bg-gray-50 p-3 rounded-lg mb-2"><b>Start:</b> <code class="bg-gray-200 px-1 rounded">[</code> back | <code class="bg-gray-200 px-1 rounded">]</code> forward</div><div class="bg-gray-50 p-3 rounded-lg mb-2"><b>End:</b> <code class="bg-gray-200 px-1 rounded">Shift [</code> back | <code class="bg-gray-200 px-1 rounded">Shift ]</code> forward</div><div class="bg-gray-50 p-3 rounded-lg"><b>Nav:</b> <code class="bg-gray-200 px-1 rounded">←/→</code> move | <code class="bg-gray-200 px-1 rounded">Space</code> play/pause</div>')}
-        ${section('After Choosing Timestamp','<div class="space-y-2 text-sm"><div class="flex gap-2"><span class="w-6 h-6 bg-indigo-600 text-white rounded-full flex items-center justify-center text-xs">1</span> Hit "Copy Time"</div><div class="flex gap-2"><span class="w-6 h-6 bg-indigo-600 text-white rounded-full flex items-center justify-center text-xs">2</span> Line break (Enter)</div><div class="flex gap-2"><span class="w-6 h-6 bg-indigo-600 text-white rounded-full flex items-center justify-center text-xs">3</span> Select tags if needed</div></div>')}`,
-      
-      checklist: `<h1 class="text-2xl font-bold text-gray-900 mb-6">Checklist</h1>${section('📄 Google Doc',link(docs.checklist,'Checklist - Full Instructions',true))}
-        ${section('Before You Submit','<div class="space-y-2">'+['Copy time for every annotation?','Line break for every annotation?','Save every annotation?','Timestamp starts when first letter visible?','Timestamp ends after last letter visible?','Annotated all major text?','Annotated background text (not blurry)?','Properly grouped text?','Properly used &lt;partial&gt; tag?','Properly used &lt;reappear&gt; tag?'].map(q=>`<label class="flex gap-3 items-start text-sm bg-gray-50 p-3 rounded-lg cursor-pointer"><input type="checkbox" class="mt-0.5"> <span>${q}</span></label>`).join('')+'</div>')}`,
-      
-      rejection: `<h1 class="text-2xl font-bold text-gray-900 mb-6">Rejection Guidelines</h1>${section('📄 Google Doc',link(docs.rejection,'Rejection Guidelines - Full Instructions',true))}
-        ${section('When to Reject 🚫','<div class="bg-red-50 border border-red-200 rounded-lg p-3 mb-2"><b class="text-red-800">Foreign Text:</b> <span class="text-red-700 text-sm">Only if 80%+ is foreign</span></div><div class="bg-red-50 border border-red-200 rounded-lg p-3 mb-2"><b class="text-red-800">Video Not Loading</b></div><div class="bg-red-50 border border-red-200 rounded-lg p-3 mb-2"><b class="text-red-800">Violating Content:</b> <span class="text-red-700 text-sm">Racial slurs or >3 swears</span></div><div class="bg-red-50 border border-red-200 rounded-lg p-3"><b class="text-red-800">No Text Anywhere</b></div>')}`,
-      
-      foreign: `<h1 class="text-2xl font-bold text-gray-900 mb-6">Foreign Language Text</h1>${section('📄 Google Doc',link(docs.foreign,'Foreign Language - Full Instructions',true))}
-        ${section('✅ Annotate','<ul class="text-sm text-gray-700 space-y-1"><li>• <b>Foreign brands:</b> Corona, Samsung, L\'Oreal</li><li>• <b>Foreign places:</b> Paris, Tokyo, Calle Ocho</li><li>• <b>Common English words:</b> taco, burrito</li></ul>')}
-        ${section('❌ Do NOT Annotate','<ul class="text-sm text-gray-700 space-y-1"><li>• Foreign text overlays (not brands/places)</li><li>• Foreign captions/subtitles</li></ul>')}
-        ${warn('The examples for this section are visual.<br><span class="text-sm font-normal">Please see the Google Doc above for specific examples.</span>')}`,
-      
-      annotation: `<h1 class="text-2xl font-bold text-gray-900 mb-6">Visual Text Annotation</h1>${section('📄 Google Doc',link(docs.annotation,'Visual Text Annotation - Full Instructions',true))}${warn('These instructions are complex and require visual examples.<br><span class="text-sm font-normal">Please see the Google Doc above.</span>')}`,
-      
-      reappear: `<h1 class="text-2xl font-bold text-gray-900 mb-6">Reappear Tag (1-Second Rule)</h1>${section('📄 Google Doc & Video',link(docs.reappear,'Reappear Tag - Full Instructions',true)+link(vids.reappear,'Video on &lt;reappear&gt; tag'))}
-        ${section('Rules','<div class="bg-green-50 border border-green-200 rounded-lg p-3 mb-2"><b class="text-green-800 text-sm">Disappears &lt;1s, reappears &lt;1s:</b><br><span class="text-green-700 text-xs">1 annotation + &lt;reappear&gt; tag</span></div><div class="bg-green-50 border border-green-200 rounded-lg p-3 mb-2"><b class="text-green-800 text-sm">Disappears &lt;1s, reappears &gt;1s:</b><br><span class="text-green-700 text-xs">1 annotation + &lt;reappear&gt; tag</span></div><div class="bg-red-50 border border-red-200 rounded-lg p-3 mb-2"><b class="text-red-800 text-sm">Disappears &gt;1s:</b><br><span class="text-red-700 text-xs">2 annotations, NO &lt;reappear&gt; tag</span></div><div class="bg-green-50 border border-green-200 rounded-lg p-3"><b class="text-green-800 text-sm">Appears &lt;1s, disappears &lt;1s, reappears &gt;1s:</b><br><span class="text-green-700 text-xs">1 annotation + &lt;reappear&gt; tag</span></div>')}
-        ${tip('You can select both &lt;partial&gt; and &lt;reappear&gt; tags for the same annotation.')}`,
-      
-      combining: `<h1 class="text-2xl font-bold text-gray-900 mb-6">Combining Text</h1>${section('📄 Google Doc',link(docs.combining,'Combining Text - Full Instructions',true))}${warn('These instructions are complex and require visual examples.<br><span class="text-sm font-normal">Please see the Google Doc above.</span>')}`,
-      
-      partial: `<h1 class="text-2xl font-bold text-gray-900 mb-6">Partial Tag</h1>${section('📄 Google Doc',link(docs.partial,'Partial Tag - Full Instructions',true))}${warn('These instructions are complex and require visual examples.<br><span class="text-sm font-normal">Please see the Google Doc above.</span>')}`,
-      
-      formatting: `<h1 class="text-2xl font-bold text-gray-900 mb-6">Text Formatting</h1>${section('📄 Google Doc',link(docs.formatting,'Text Formatting - Full Instructions',true))}${warn('These instructions are complex and require visual examples.<br><span class="text-sm font-normal">Please see the Google Doc above.</span>')}`,
-      
-      blurry: `<h1 class="text-2xl font-bold text-gray-900 mb-6">Blurry Text</h1>${section('📄 Google Doc & Video',link(docs.blurry,'Blurry Text - Full Instructions',true)+link(vids.blurry,'Video on blurry text'))}${warn('These instructions are complex and require visual examples.<br><span class="text-sm font-normal">Please see the Google Doc above.</span>')}`,
-      
-      golden: `<h1 class="text-2xl font-bold text-gray-900 mb-6">Golden Examples</h1>${section('📄 Google Doc & Video',link(docs.golden,'Golden Examples - Full Instructions',true)+link(vids.walkthrough,'Video walk-through'))}${warn('These instructions are complex and require visual examples.<br><span class="text-sm font-normal">Please see the Google Doc above.</span>')}`,
-      
-      errors: `<h1 class="text-2xl font-bold text-gray-900 mb-6">Common Errors</h1>${section('📄 Google Doc & Video',link(docs.errors,'Common Errors - Full Instructions',true)+link(vids.errors,'Common errors video'))}
-        ${section('Quick Reference','<div class="text-sm text-gray-700 space-y-2"><p><b>1. Missing Line Break</b> - Always include between timestamp and text</p><p><b>2. Mismatched Times</b> - UI timestamp must match annotation</p><p><b>3. Not Expanding Before Submit</b> - Check each annotation</p><p><b>4. Grouping Issues</b> - Use grouping rules for text-heavy areas</p><p><b>5. Missing Partial Tags</b> - Most annotations need &lt;partial&gt;</p></div>')}`,
-      
-      efficiency: `<h1 class="text-2xl font-bold text-gray-900 mb-6">Efficiency Tips</h1>${section('📄 Google Doc',link(docs.efficiency,'Efficiency Tips - Full Instructions',true))}
-        ${section('Workflow','<div class="space-y-2 text-sm">'+[['1','Full Video Overview','Watch once at normal speed'],['2','Annotate Primary Text','Watch at 0.5x, use arrow keys'],['3','Capture Additional Text','Zoom into quadrants'],['4','Use Duplication','Duplicate nearby annotations'],['5','Final Checks','Verify timestamps, line breaks, tags']].map(s=>`<div class="flex gap-3 p-2 bg-gray-50 rounded-lg"><div class="w-7 h-7 bg-indigo-600 text-white rounded-full flex items-center justify-center font-bold text-xs">${s[0]}</div><div><b>${s[1]}</b><br><span class="text-gray-600 text-xs">${s[2]}</span></div></div>`).join('')+'</div>')}`,
-      
-      bonuses: `<h1 class="text-2xl font-bold text-gray-900 mb-6">Bonuses</h1>${section('📄 Google Doc',link(docs.bonuses,'Bonuses - Full Instructions',true))}
-        ${section('Weekly Bonus Structure','<div class="bg-green-50 border border-green-200 rounded-lg p-3 mb-2"><b class="text-green-800">$200</b> <span class="text-green-700 text-sm">- >30 tasks + quality >3.5</span></div><div class="bg-green-50 border border-green-200 rounded-lg p-3 mb-2"><b class="text-green-800">$150</b> <span class="text-green-700 text-sm">- >25 tasks + quality >3.5</span></div><div class="bg-green-50 border border-green-200 rounded-lg p-3"><b class="text-green-800">$100</b> <span class="text-green-700 text-sm">- >20 tasks + quality >3.5</span></div>')}
-        ${section('Notes','<ul class="text-sm text-gray-700 space-y-1"><li>• Bonuses run Friday to Friday</li><li>• Processed by Monday 9 AM PST</li><li>• Incorrect rejections count toward total</li><li>• Correct rejections do NOT count</li></ul>')}`,
-      
-      support: `<h1 class="text-2xl font-bold text-gray-900 mb-6">Support</h1>
-        ${section('Slack Channels','<p class="text-sm text-gray-700 mb-2">For most questions, use Slack:</p><ul class="text-sm text-gray-700 space-y-1"><li>• <b>#ocr-task-questions</b> - Instructions inquiries</li><li>• <b>#parimango-and-finances-support</b> - Tooling</li></ul>')}
-        ${section('Email Support','<ul class="text-sm text-gray-700 space-y-1"><li>• <a href="mailto:support@mercor.com" class="text-indigo-600 underline">support@mercor.com</a> - Mercor inquiries</li><li>• <a href="mailto:malachitesupport@mercor.com" class="text-indigo-600 underline">malachitesupport@mercor.com</a> - Project inquiries</li></ul>')}`
+      home: `
+        <div class="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-2xl p-6 text-white mb-6">
+          <h1 class="text-2xl font-bold mb-2">Project Brady - OCR</h1>
+          <p class="text-indigo-100">Onboarding + Instructions</p>
+          <p class="text-indigo-200 text-sm mt-2">Last updated: Dec 11, 2025</p>
+        </div>
+        ${section('Introduction and Goal', '<p class="text-gray-700 text-sm">AI models often struggle in their ability to break down and identify visual text in short videos, due to potentially limited training data, gaps in context, ambiguity/complexity, model limitations, etc.</p><p class="text-gray-700 text-sm mt-2">In order to tackle this, we are producing a two-part task that helps AI models improve on the above.</p>')}
+        ${section('In Practice, You Will', `
+          <div class="space-y-2">
+            <div class="flex gap-3 items-start">
+              <div class="w-6 h-6 bg-indigo-600 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">1</div>
+              <span class="text-gray-700 text-sm">Watch a short video, which should be no more than 15 seconds in length</span>
+            </div>
+            <div class="flex gap-3 items-start">
+              <div class="w-6 h-6 bg-indigo-600 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">2</div>
+              <span class="text-gray-700 text-sm">Write down and timestamp every single piece of visual text in the video</span>
+            </div>
+          </div>
+        `)}
+        ${tip('The activities you are carrying out will not only measure existing model capabilities, but will also train and improve future AI models. You will play a key role in enabling the client\'s models to improve on video-related tasks.')}
+        ${section('Quick Links', `
+          <div class="grid gap-2">
+            ${secondaryLink('https://drive.google.com/file/d/1A8aDEe4KyB0SLAydEVKBfqBTwNFMut1o/view?usp=drive_link', 'Walk-through on how to do a task')}
+            ${secondaryLink('https://drive.google.com/file/d/1Rr8y3NiSbfmWI1gt1o99HWNFv2MSTRjh/view?usp=sharing', 'Common errors video')}
+            ${secondaryLink('https://drive.google.com/file/d/1LPEqIly3Gm_g09V3LHpvVT5zRVtZfuKY/view?usp=sharing', 'Video on &lt;reappear&gt; tag')}
+            ${secondaryLink('https://drive.google.com/file/d/1SElGngKshM9tbmdZkMppOkFMIe1ONR7-/view?usp=drive_link', 'Video on blurry text')}
+            ${secondaryLink('https://docs.google.com/document/d/1rxEcG83Nd88naNqygbRHaz4MaFCZmkt4wZ5oEJAoX5U/edit?tab=t.ar5od8p5v2t', 'Foreign language text instructions')}
+            ${secondaryLink('https://drive.google.com/file/d/1-Ym0RVvPNn0h7uQyevsitu7xcyVcMmcB/view?usp=drive_link', '12/17 office hours recording')}
+          </div>
+        `)}
+      `,
+
+      alllinks: `
+        <h1 class="text-2xl font-bold text-gray-900 mb-6">Link to All Instructions</h1>
+        ${section('📄 Master Google Doc', primaryLink('https://docs.google.com/document/d/1rxEcG83Nd88naNqygbRHaz4MaFCZmkt4wZ5oEJAoX5U/edit?tab=t.mlrf9inidopo', '📘 Project Brady - OCR: All Instructions'))}
+        ${tip('This link contains the complete set of instructions for Project Brady - OCR. Use this as your primary reference for all annotation guidelines.')}
+      `,
+
+      walkthrough: `
+        <h1 class="text-2xl font-bold text-gray-900 mb-6">Task Walk-through</h1>
+        ${section('📄 Google Doc', primaryLink('https://docs.google.com/document/d/1rxEcG83Nd88naNqygbRHaz4MaFCZmkt4wZ5oEJAoX5U/edit?tab=t.kife1a9lmyuc', '📘 Task Walk-through - Full Instructions'))}
+        ${section('Production Queue', secondaryLink('https://www.parimango.com/tasks/121125-ocr-chunked-mercor-posttraining', 'Parimango Production Queue'))}
+        ${warning('Please make sure only to access the production queue via the link above, as you will have access to other, non-relevant queues.')}
+        ${section('Top OCR Labeler Habits', `
+          <ul class="space-y-2 text-sm text-gray-700">
+            <li class="flex gap-2"><svg class="w-4 h-4 text-indigo-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg><span><strong>Start with context:</strong> Watch the video 1–2 times (often at 0.5x) to understand where text appears, reappears, or hides.</span></li>
+            <li class="flex gap-2"><svg class="w-4 h-4 text-indigo-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg><span><strong>Delete auto-generated annotations:</strong> Most experts find them distracting and error-prone.</span></li>
+            <li class="flex gap-2"><svg class="w-4 h-4 text-indigo-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg><span><strong>Annotate systematically:</strong> Work scene-by-scene, object-by-object, or top-to-bottom/left-to-right.</span></li>
+            <li class="flex gap-2"><svg class="w-4 h-4 text-indigo-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg><span><strong>Prioritize obvious text first:</strong> Captions, overlays, large signs → then smaller, sneakier text.</span></li>
+            <li class="flex gap-2"><svg class="w-4 h-4 text-indigo-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg><span><strong>Track persistence:</strong> Follow one object/player/text through its full lifespan before moving on.</span></li>
+            <li class="flex gap-2"><svg class="w-4 h-4 text-indigo-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg><span><strong>Use frame-by-frame review:</strong> Especially to catch &lt;partial&gt; and &lt;reappear&gt; cases.</span></li>
+            <li class="flex gap-2"><svg class="w-4 h-4 text-indigo-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg><span><strong>Be strict about legibility:</strong> If a letter isn't readable without context, don't infer it.</span></li>
+            <li class="flex gap-2"><svg class="w-4 h-4 text-indigo-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg><span><strong>Multiple review passes:</strong> Final checks almost always catch missed timestamps, tags, line breaks, or formatting issues.</span></li>
+          </ul>
+        `)}
+        ${section('Step-by-Step Process', `
+          <div class="space-y-3">
+            ${stepItem(1, 'First Pass: Understand the Video', 'Watch the full video once (or twice) at normal or half speed. Note major text, minor/hidden text, text that reappears or moves, and scene cuts.')}
+            ${stepItem(2, 'Delete Pre-generated Annotations', 'Delete or fully ignore pre-generated annotations. Use them only as a final sanity check. Reset mentally: assume you must find everything.')}
+            ${stepItem(3, 'Choose a Systematic Strategy', 'Use one consistent method: scene by scene, object by object, or top-to-bottom/left-to-right. Consistency matters more than which method.')}
+            ${stepItem(4, 'Annotate Major Text First', 'Start with captions, overlays. For changing captions, create a new annotation per block. Use Duplicate for multiple text regions in same timeframe.')}
+            ${stepItem(5, 'Annotate Smaller & Sneakier Text', 'Zoom aggressively (5x + trackpad zoom). Divide frame into quadrants. Go frame by frame. Look for brief visibility, partial obstructions, reflections.')}
+            ${stepItem(6, 'Handle Special Cases', 'Use &lt;partial&gt; for obstructed/incomplete text. Use &lt;reappear&gt; for text that disappears and returns. Judge blurry letters individually.')}
+            ${stepItem(7, 'Timestamps & Formatting', "Use [] or arrow keys to fine-tune. Click 'Copy Time' when creating, editing, and during final review. Ensure correct line breaks and formatting.")}
+            ${stepItem(8, 'First Review Pass: Accuracy', 'Play the preview for each annotation. Check spelling, formatting, tags, and that start/end frames match visibility.')}
+            ${stepItem(9, 'Second Review Pass: Precision', 'Scrub frame-by-frame through whole video. Watch for missed text, partial obstructions, timestamps running past video end.')}
+            ${stepItem(10, 'Final Sanity Check', 'Click every annotation, copy time again, confirm timestamps match text. Ensure every annotation is modified or deleted. Only then submit.')}
+          </div>
+        `)}
+        ${tip("<strong>Key Mindset:</strong> If you see it, annotate it. If you can't clearly read it, don't guess. Precision beats speed. Multiple passes are normal and necessary.")}
+      `,
+
+      parimango: `
+        <h1 class="text-2xl font-bold text-gray-900 mb-6">Parimango UI / Instructions</h1>
+        ${section('📄 Google Doc', primaryLink('https://docs.google.com/document/d/1rxEcG83Nd88naNqygbRHaz4MaFCZmkt4wZ5oEJAoX5U/edit?tab=t.rhvar9nym8md', '📘 Parimango UI - Full Instructions'))}
+        ${section('Key Rules', `
+          <ul class="space-y-3 text-sm text-gray-700">
+            <li class="flex gap-2"><span class="font-bold text-indigo-600">1.</span> All visual text visible in the video should be written out, regardless of if it is pre-generated or not</li>
+            <li class="flex gap-2"><span class="font-bold text-indigo-600">2.</span> You do not need to order the timestamps</li>
+            <li class="flex gap-2"><span class="font-bold text-indigo-600">3.</span> You must use keyboard shortcuts to pick start and end timestamps (do NOT copy timestamps like in Halo)</li>
+          </ul>
+        `)}
+        ${section('Keyboard Shortcuts', `
+          <div class="grid gap-2 text-sm">
+            <div class="bg-gray-50 p-3 rounded-lg">
+              <p class="font-semibold text-gray-900">Starting Timestamp:</p>
+              <p class="text-gray-600"><code class="bg-gray-200 px-1 rounded">[</code> = go back one frame | <code class="bg-gray-200 px-1 rounded">]</code> = go forward one frame</p>
+            </div>
+            <div class="bg-gray-50 p-3 rounded-lg">
+              <p class="font-semibold text-gray-900">Ending Timestamp:</p>
+              <p class="text-gray-600"><code class="bg-gray-200 px-1 rounded">Shift [</code> = go back one frame | <code class="bg-gray-200 px-1 rounded">Shift ]</code> = go forward one frame</p>
+            </div>
+            <div class="bg-gray-50 p-3 rounded-lg">
+              <p class="font-semibold text-gray-900">Navigation:</p>
+              <p class="text-gray-600"><code class="bg-gray-200 px-1 rounded">←</code> / <code class="bg-gray-200 px-1 rounded">→</code> = move within timestamp range | <code class="bg-gray-200 px-1 rounded">Spacebar</code> = play/pause</p>
+            </div>
+            <div class="bg-gray-50 p-3 rounded-lg">
+              <p class="font-semibold text-gray-900">Other:</p>
+              <p class="text-gray-600"><code class="bg-gray-200 px-1 rounded">Zoom button</code> = zoom in | <code class="bg-gray-200 px-1 rounded">Control + Click</code> = emoji selector</p>
+            </div>
+          </div>
+        `)}
+        ${section('When You Have Chosen Your Timestamp', `
+          <div class="space-y-2">
+            <div class="flex gap-2 items-center text-sm"><span class="w-6 h-6 bg-indigo-600 text-white rounded-full flex items-center justify-center text-xs">1</span> Hit "Copy Time"</div>
+            <div class="flex gap-2 items-center text-sm"><span class="w-6 h-6 bg-indigo-600 text-white rounded-full flex items-center justify-center text-xs">2</span> Make a line break (press "Enter")</div>
+            <div class="flex gap-2 items-center text-sm"><span class="w-6 h-6 bg-indigo-600 text-white rounded-full flex items-center justify-center text-xs">3</span> Choose &lt;partial&gt; and/or &lt;many&gt; tag (if applicable)</div>
+          </div>
+        `)}
+        ${warning('If you do not do all of the above, your work will not be in the correct format, which will make your task fail.')}
+        ${section('Important Reminders', `
+          <ul class="space-y-2 text-sm text-gray-700">
+            <li>• Hit <strong>"Save"</strong> after you are done editing a visual text element</li>
+            <li>• Use <strong>"Duplicate"</strong> button to duplicate timestamps (like "Multiply" in autoformatting tool)</li>
+            <li>• If pre-generated text doesn't exist in video, click the <strong>trash can</strong> to delete it</li>
+            <li>• Once fully done, hit <strong>"Submit & Next"</strong></li>
+            <li>• Do not write &lt;partial&gt;, &lt;reappear&gt;, or &lt;many&gt; tags manually - select them in Parimango</li>
+          </ul>
+        `)}
+      `,
+
+      checklist: `
+        <h1 class="text-2xl font-bold text-gray-900 mb-6">Checklist</h1>
+        <p class="text-gray-600 text-sm mb-6">Review this checklist before submitting every task.</p>
+        ${section('📄 Google Doc', primaryLink('https://docs.google.com/document/d/1rxEcG83Nd88naNqygbRHaz4MaFCZmkt4wZ5oEJAoX5U/edit?tab=t.z7k33df9q6zk', '📘 Checklist - Full Instructions'))}
+        ${section('Before You Submit', `
+          <div class="space-y-3">
+            ${checkItem('Did you copy time for every annotation?')}
+            ${checkItem('Did you line break for every annotation?')}
+            ${checkItem('Did you save every annotation?')}
+            ${checkItem('Does every timestamp start when the first letter of each element of visual text is visible?')}
+            ${checkItem('Does every timestamp end in the frame directly following when the last letter of the visual text element is visible?')}
+            ${checkItem('Did you annotate all of the major (e.g., clear and obvious) text?')}
+            ${checkItem('Did you annotate the background (e.g., harder to see) text? But make sure you are not annotating blurry text!')}
+            ${checkItem('Did you properly group text according to the instructions?')}
+            ${checkItem('Did you properly use the &lt;partial&gt; tag?')}
+            ${checkItem('Did you properly use the &lt;reappear&gt; tag?')}
+          </div>
+        `)}
+      `,
+
+      rejection: `
+        <h1 class="text-2xl font-bold text-gray-900 mb-6">Rejection Guidelines</h1>
+        ${section('📄 Google Doc', primaryLink('https://docs.google.com/document/d/1rxEcG83Nd88naNqygbRHaz4MaFCZmkt4wZ5oEJAoX5U/edit?tab=t.k0i0lk2yd2ry', '📘 Rejection Guidelines - Full Instructions'))}
+        ${warning('It is important to watch the entire video before starting your annotation. If you notice ANY violations below, reject the task.')}
+        ${section('When to Reject Videos 🚫', `
+          <div class="space-y-4">
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+              <h3 class="font-semibold text-red-800 mb-2">Foreign (non-English) Text</h3>
+              <p class="text-red-700 text-sm">Only reject if foreign language visual text makes up <strong>80% or more</strong> of total visual text. If not rejected, just write the English text.</p>
+            </div>
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+              <h3 class="font-semibold text-red-800 mb-2">Video Not Loading</h3>
+              <p class="text-red-700 text-sm">Self-explanatory - reject if the video fails to load.</p>
+            </div>
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+              <h3 class="font-semibold text-red-800 mb-2">Violating Content</h3>
+              <p class="text-red-700 text-sm">Reject if video contains ANY racial slurs, or &gt; 3 swears.</p>
+              <p class="text-red-600 text-xs mt-2"><strong>Exception:</strong> If intentionally misspelled or bleeped out, it's OK.</p>
+            </div>
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+              <h3 class="font-semibold text-red-800 mb-2">No Text Anywhere</h3>
+              <p class="text-red-700 text-sm">If there is ZERO visual text in the video, reject.</p>
+            </div>
+          </div>
+        `)}
+        ${section('How to Reject', '<p class="text-gray-700 text-sm">Click <strong>"Reject Sample (Bad/Unusable)"</strong> button in Parimango.</p>')}
+      `,
+
+      foreign: `
+        <h1 class="text-2xl font-bold text-gray-900 mb-6">Foreign Language Text</h1>
+        ${section('📄 Google Doc', primaryLink('https://docs.google.com/document/d/1rxEcG83Nd88naNqygbRHaz4MaFCZmkt4wZ5oEJAoX5U/edit?tab=t.ar5od8p5v2t', '📘 Foreign Language Text - Full Instructions'))}
+        ${section('✅ Annotate', `
+          <ul class="space-y-2 text-sm text-gray-700">
+            <li>• <strong>ALL foreign brands:</strong> Corona, Samsung, L'Oreal, Hermès, Itaú BBA, etc.</li>
+            <li>• <strong>ALL foreign places:</strong> Guadalajara, Paris, Tokyo, Calle Ocho, etc.</li>
+            <li>• <strong>Words commonly seen in English:</strong> taco, burrito, etc.</li>
+          </ul>
+        `)}
+        ${section('❌ Do NOT Annotate', `
+          <ul class="space-y-2 text-sm text-gray-700">
+            <li>• Foreign text overlays that are NOT brands, places, or common English words</li>
+            <li>• Foreign language captions or subtitles</li>
+          </ul>
+        `)}
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-6 text-center mb-4">
+          <svg class="w-8 h-8 text-amber-500 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+          <p class="text-amber-800 font-medium">The examples for this section are visual.</p>
+          <p class="text-amber-700 text-sm mt-2">Please see the Google Doc above for specific examples.</p>
+        </div>
+        ${tip('Use <strong>&lt;partial&gt;</strong> tag when not all text on an object is being annotated (because some is foreign language).')}
+      `,
+
+      annotation: `
+        <h1 class="text-2xl font-bold text-gray-900 mb-6">Visual Text Annotation</h1>
+        ${section('📄 Google Doc', primaryLink('https://docs.google.com/document/d/1rxEcG83Nd88naNqygbRHaz4MaFCZmkt4wZ5oEJAoX5U/edit?tab=t.zbwyoyd8s24e', '📘 Visual Text Annotation - Full Instructions'))}
+        ${visualWarning}
+      `,
+
+      reappear: `
+        <h1 class="text-2xl font-bold text-gray-900 mb-6">Reappear Tag (1-Second Rule)</h1>
+        ${section('📄 Google Doc & Video', `
+          <div class="grid gap-2">
+            ${primaryLink('https://docs.google.com/document/d/1rxEcG83Nd88naNqygbRHaz4MaFCZmkt4wZ5oEJAoX5U/edit?tab=t.pjkfg45s9yaq', '📘 Reappear Tag - Full Instructions')}
+            ${secondaryLink('https://drive.google.com/file/d/1LPEqIly3Gm_g09V3LHpvVT5zRVtZfuKY/view?usp=sharing', 'Video on &lt;reappear&gt; tag')}
+          </div>
+        `)}
+        ${section('Rules', `
+          <div class="space-y-3">
+            <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+              <p class="font-semibold text-green-800 text-sm mb-2">If text disappears for &lt; 1 second and then reappears for &lt; 1 second:</p>
+              <ul class="text-green-700 text-xs space-y-1 ml-4">
+                <li>• Have 1 annotation</li>
+                <li>• Annotate text as if it does not leave the screen</li>
+                <li>• Add a &lt;reappear&gt; tag</li>
+              </ul>
+            </div>
+            <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+              <p class="font-semibold text-green-800 text-sm mb-2">If text disappears for &lt; 1 second and then reappears for &gt; 1 second:</p>
+              <ul class="text-green-700 text-xs space-y-1 ml-4">
+                <li>• Have 1 annotation</li>
+                <li>• Annotate text as if it does not leave the screen</li>
+                <li>• Add a &lt;reappear&gt; tag</li>
+              </ul>
+            </div>
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+              <p class="font-semibold text-red-800 text-sm mb-2">If text disappears for &gt; 1 second and then reappears for any amount of time:</p>
+              <ul class="text-red-700 text-xs space-y-1 ml-4">
+                <li>• Have 2 annotations</li>
+                <li>• Annotate text only when the text is on the screen</li>
+                <li>• No &lt;reappear&gt; tag</li>
+              </ul>
+            </div>
+            <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+              <p class="font-semibold text-green-800 text-sm mb-2">If text appears for &lt; 1 second, disappears for &lt; 1 second, and reappears for &gt; 1 second:</p>
+              <ul class="text-green-700 text-xs space-y-1 ml-4">
+                <li>• Have 1 annotation</li>
+                <li>• Annotate text as if it does not leave the screen</li>
+                <li>• Add a &lt;reappear&gt; tag</li>
+              </ul>
+            </div>
+          </div>
+        `)}
+        ${section('Examples', `
+          <div class="space-y-4">
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <p class="font-semibold text-sm mb-2">Example 1: &lt;1s disappearance, &lt;1s reappearance</p>
+              ${codeBlock('00.00-03.00\n&lt;reappear&gt;\nTEXT')}
+            </div>
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <p class="font-semibold text-sm mb-2">Example 2: &lt;1s disappearance, &gt;1s reappearance</p>
+              ${codeBlock('00.00-10.00\n&lt;reappear&gt;\nTEXT')}
+            </div>
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <p class="font-semibold text-sm mb-2">Example 3: &gt;1s disappearance (needs 2 annotations)</p>
+              ${codeBlock('00.00-02.00\nTEXT\n\n04.00-06.00\nTEXT')}
+            </div>
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <p class="font-semibold text-sm mb-2">Example 4: &lt;1s original appearance, &lt;1s disappearance, &gt;1s reappearance</p>
+              <p class="text-xs text-gray-600 mb-2">1 annotation</p>
+              ${codeBlock('00.00-05.00\n&lt;reappear&gt;\nTEXT')}
+              <p class="text-xs text-amber-700 mt-2 bg-amber-50 p-2 rounded">⚠️ Do not forget about &lt;partial&gt; tags if the text is partially visible at any point when the visual text is on screen</p>
+            </div>
+          </div>
+        `)}
+        ${tip('You can select both &lt;partial&gt; and &lt;reappear&gt; tags for the same annotation. If text becomes too blurry to read, treat it as if the text disappeared.')}
+      `,
+
+      combining: `
+        <h1 class="text-2xl font-bold text-gray-900 mb-6">Combining Text</h1>
+        ${section('📄 Google Doc', primaryLink('https://docs.google.com/document/d/1rxEcG83Nd88naNqygbRHaz4MaFCZmkt4wZ5oEJAoX5U/edit?tab=t.ogihf4y6enq2', '📘 Combining Text - Full Instructions'))}
+        ${visualWarning}
+      `,
+
+      partial: `
+        <h1 class="text-2xl font-bold text-gray-900 mb-6">When to Use &lt;partial&gt; Tag</h1>
+        ${section('📄 Google Doc', primaryLink('https://docs.google.com/document/d/1rxEcG83Nd88naNqygbRHaz4MaFCZmkt4wZ5oEJAoX5U/edit?tab=t.q5z69hs42tyq', '📘 Partial Tag - Full Instructions'))}
+        ${visualWarning}
+      `,
+
+      formatting: `
+        <h1 class="text-2xl font-bold text-gray-900 mb-6">Text Formatting</h1>
+        ${section('📄 Google Doc', primaryLink('https://docs.google.com/document/d/1rxEcG83Nd88naNqygbRHaz4MaFCZmkt4wZ5oEJAoX5U/edit?tab=t.jh87t1b33gn0', '📘 Text Formatting - Full Instructions'))}
+        ${visualWarning}
+      `,
+
+      blurry: `
+        <h1 class="text-2xl font-bold text-gray-900 mb-6">Blurry Text</h1>
+        ${section('📄 Google Doc & Video', `
+          <div class="grid gap-2">
+            ${primaryLink('https://docs.google.com/document/d/1rxEcG83Nd88naNqygbRHaz4MaFCZmkt4wZ5oEJAoX5U/edit?tab=t.u01276a1rfra', '📘 Blurry Text - Full Instructions')}
+            ${secondaryLink('https://drive.google.com/file/d/1SElGngKshM9tbmdZkMppOkFMIe1ONR7-/view?usp=drive_link', 'Video on blurry text')}
+          </div>
+        `)}
+        ${visualWarning}
+      `,
+
+      golden: `
+        <h1 class="text-2xl font-bold text-gray-900 mb-6">Golden Examples</h1>
+        ${section('📄 Google Doc & Video', `
+          <div class="grid gap-2">
+            ${primaryLink('https://docs.google.com/document/d/1rxEcG83Nd88naNqygbRHaz4MaFCZmkt4wZ5oEJAoX5U/edit?tab=t.dg3hkgymhnfl', '📘 Golden Examples - Full Instructions')}
+            ${secondaryLink('https://drive.google.com/file/d/1A8aDEe4KyB0SLAydEVKBfqBTwNFMut1o/view?usp=drive_link', 'Video walk-through on how to do a task')}
+          </div>
+        `)}
+        ${visualWarning}
+      `,
+
+      errors: `
+        <h1 class="text-2xl font-bold text-gray-900 mb-6">Common Errors</h1>
+        ${section('📄 Google Doc & Video', `
+          <div class="grid gap-2">
+            ${primaryLink('https://docs.google.com/document/d/1rxEcG83Nd88naNqygbRHaz4MaFCZmkt4wZ5oEJAoX5U/edit?tab=t.i4wnisvo9cum', '📘 Common Errors - Full Instructions')}
+            ${secondaryLink('https://drive.google.com/file/d/1Rr8y3NiSbfmWI1gt1o99HWNFv2MSTRjh/view?usp=sharing', '12/27/25 common errors video')}
+          </div>
+        `)}
+        ${section('1. Missing Line Break', '<p class="text-sm text-gray-700">Always include a line break between timestamp and text.</p>')}
+        ${section('2. Mismatched Segment/Annotated Time', '<p class="text-sm text-gray-700">The timestamp in the UI must match the timestamp in your text annotation.</p>')}
+        ${section('3. Not Expanding Annotations Before Submit', '')}
+        ${warning('Before submitting, open EACH annotation to double-check for issues - they\'re easy to miss unless you expand each one.')}
+        ${section('4. Grouping Issues', '<p class="text-sm text-gray-700">We see many annotations broken into unnecessary timestamps. Take advantage of grouping rules for text-heavy areas: product labels, sports jerseys, signs can often be grouped together.</p>')}
+        ${section('5. Missing Partial Tags', '<p class="text-sm text-gray-700">Most annotations will need a &lt;partial&gt; tag. Always review annotations without partial tags to make sure they don\'t need one.</p>')}
+        ${section('6. Paused Frame Not in Video', '')}
+        ${warning("The paused frame before you hit play may not actually be in the video. Always hit 'Play full video' button before starting. Do not annotate anything not in the full video playback.")}
+      `,
+
+      efficiency: `
+        <h1 class="text-2xl font-bold text-gray-900 mb-6">Efficiency Tips</h1>
+        ${section('📄 Google Doc', primaryLink('https://docs.google.com/document/d/1rxEcG83Nd88naNqygbRHaz4MaFCZmkt4wZ5oEJAoX5U/edit?tab=t.kdty168th20o', '📘 Efficiency Tips - Full Instructions'))}
+        ${section('Workflow', `
+          <div class="space-y-3">
+            <div class="flex gap-3 p-3 bg-gray-50 rounded-lg">
+              <div class="w-7 h-7 bg-indigo-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 text-sm">1</div>
+              <div>
+                <h3 class="font-semibold text-gray-900 text-sm">Full Video Overview</h3>
+                <p class="text-gray-600 text-xs">Watch once at normal speed to understand where text appears.</p>
+              </div>
+            </div>
+            <div class="flex gap-3 p-3 bg-gray-50 rounded-lg">
+              <div class="w-7 h-7 bg-indigo-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 text-sm">2</div>
+              <div>
+                <h3 class="font-semibold text-gray-900 text-sm">Annotate Primary Text</h3>
+                <p class="text-gray-600 text-xs">Watch at 0.5× speed. Align pre-generated text first. Use arrow keys for frame-by-frame. Annotate captions, titles, UI elements.</p>
+              </div>
+            </div>
+            <div class="flex gap-3 p-3 bg-gray-50 rounded-lg">
+              <div class="w-7 h-7 bg-indigo-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 text-sm">3</div>
+              <div>
+                <h3 class="font-semibold text-gray-900 text-sm">Capture Additional Text</h3>
+                <p class="text-gray-600 text-xs">Go scene-by-scene. Zoom into quadrants. Do focused sweeps: Captions → Timers/Numbers → Signs/Logos → Clothing.</p>
+              </div>
+            </div>
+            <div class="flex gap-3 p-3 bg-gray-50 rounded-lg">
+              <div class="w-7 h-7 bg-indigo-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 text-sm">4</div>
+              <div>
+                <h3 class="font-semibold text-gray-900 text-sm">Use Duplication</h3>
+                <p class="text-gray-600 text-xs">Duplicate nearby annotations to quickly capture new text without re-scrubbing.</p>
+              </div>
+            </div>
+            <div class="flex gap-3 p-3 bg-gray-50 rounded-lg">
+              <div class="w-7 h-7 bg-indigo-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 text-sm">5</div>
+              <div>
+                <h3 class="font-semibold text-gray-900 text-sm">Final Checks</h3>
+                <p class="text-gray-600 text-xs">Verify timestamps copied, line breaks present, formatting preserved, 1-second rule applied, partial tags complete.</p>
+              </div>
+            </div>
+          </div>
+        `)}
+        ${tip('<strong>Workflow:</strong> Overview → Annotate primary text → Structured background sweeps → Final checks')}
+        ${section('Flipped Text Helper', `
+          <p class="text-sm text-gray-700 mb-2">If you struggle to read flipped text:</p>
+          <ol class="space-y-1 text-sm text-gray-700">
+            <li>1. Go to <a href="https://pinetools.com/flip-image" class="text-indigo-600 underline">pinetools.com/flip-image</a></li>
+            <li>2. Drag your screenshot into 'Input Image' box</li>
+            <li>3. Hit 'FLIP'</li>
+            <li>4. Your text is now readable!</li>
+          </ol>
+        `)}
+      `,
+
+      bonuses: `
+        <h1 class="text-2xl font-bold text-gray-900 mb-6">Bonuses</h1>
+        ${section('📄 Google Doc', primaryLink('https://docs.google.com/document/d/1rxEcG83Nd88naNqygbRHaz4MaFCZmkt4wZ5oEJAoX5U/edit?tab=t.9fn5f826pned', '📘 Bonuses - Full Instructions'))}
+        ${section('Weekly Bonus Structure', `
+          <div class="space-y-3">
+            <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+              <p class="font-bold text-green-800">$200 Bonus</p>
+              <p class="text-green-700 text-sm">&gt;30 audited tasks + average quality score &gt; 3.5</p>
+            </div>
+            <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+              <p class="font-bold text-green-800">$150 Bonus</p>
+              <p class="text-green-700 text-sm">&gt;25 audited tasks + average quality score &gt; 3.5</p>
+            </div>
+            <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+              <p class="font-bold text-green-800">$100 Bonus</p>
+              <p class="text-green-700 text-sm">&gt;20 audited tasks + average quality score &gt; 3.5</p>
+            </div>
+          </div>
+        `)}
+        ${section('Notes', `
+          <ul class="space-y-2 text-sm text-gray-700">
+            <li>• Bonuses run Friday to Friday</li>
+            <li>• Processed by Monday at 9 AM PST</li>
+            <li>• Incorrect rejections count toward task number</li>
+            <li>• Correct rejections do NOT count toward task number</li>
+          </ul>
+        `)}
+      `,
+
+      support: `
+        <h1 class="text-2xl font-bold text-gray-900 mb-6">Support</h1>
+        ${section('Slack Channels', `
+          <p class="text-sm text-gray-700 mb-3">For most questions, you can use Slack to reach your peers and our project managers:</p>
+          <ul class="space-y-2 text-sm text-gray-700">
+            <li>• For instructions-specific inquiries, use <strong>#ocr-task-questions</strong></li>
+            <li>• For inquiries regarding tooling, check information in <strong>#parimango-and-finances-support</strong>
+              <ul class="ml-4 mt-1">
+                <li>• If you are having issues, please fill out this <a href="#" class="text-indigo-600 underline font-medium">form</a></li>
+              </ul>
+            </li>
+          </ul>
+        `)}
+        ${section('Email Support', `
+          <ul class="space-y-2 text-sm text-gray-700">
+            <li>• For any Mercor-specific inquiries, please reach out to: <a href="mailto:support@mercor.com" class="text-indigo-600 underline font-medium">support@mercor.com</a></li>
+            <li>• For project-specific personal inquiries, please reach out to: <a href="mailto:malachitesupport@mercor.com" class="text-indigo-600 underline font-medium">malachitesupport@mercor.com</a></li>
+          </ul>
+        `)}
+      `
     };
 
     function toggleMenu() {
-      document.getElementById('sidebar').classList.toggle('-translate-x-full');
-      document.getElementById('overlay').classList.toggle('hidden');
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('overlay');
+      const menuIcon = document.getElementById('menuIcon');
+      const closeIcon = document.getElementById('closeIcon');
+      sidebar.classList.toggle('-translate-x-full');
+      overlay.classList.toggle('hidden');
+      menuIcon.classList.toggle('hidden');
+      closeIcon.classList.toggle('hidden');
     }
 
     function showTab(id) {
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
       document.querySelector(`[data-tab="${id}"]`).classList.add('active');
       document.getElementById('content').innerHTML = content[id];
-      if(window.innerWidth < 1024) toggleMenu();
+      if (window.innerWidth < 1024) toggleMenu();
+      window.scrollTo(0, 0);
     }
 
-    // Build nav
+    // Build navigation
     const nav = document.getElementById('nav');
-    tabs.forEach(t => {
+    tabs.forEach((t, i) => {
       const btn = document.createElement('button');
-      btn.className = `nav-item flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm font-medium ${t.id==='home'?'active':'text-gray-600 hover:bg-gray-100'}`;
+      btn.className = `nav-item flex items-center gap-2 w-full px-3 py-2 rounded-lg transition-all text-sm ${i === 0 ? 'active' : 'text-gray-600 hover:bg-gray-100'}`;
       btn.dataset.tab = t.id;
-      btn.textContent = t.label;
+      btn.innerHTML = `<span>${t.icon}</span><span class="font-medium truncate">${t.label}</span>`;
       btn.onclick = () => showTab(t.id);
       nav.appendChild(btn);
     });
 
-    // Initial content
+    // Show initial content
     document.getElementById('content').innerHTML = content.home;
   </script>
 </body>
